@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetWatch</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><h1>NetWatch</h1><span id="status" class="pill">Idle</span></div>
+    <div class="controls">
+      <select id="iface" aria-label="Network interface"><option value="">Default interface</option></select>
+      <button id="btn-start" class="primary">Start capture</button>
+      <button id="btn-stop" disabled>Stop capture</button>
+      <label class="btn" id="upload-label">Upload PCAP<input id="file" type="file" accept=".pcap,.pcapng,.cap" hidden></label>
+      <button id="btn-clear">Clear</button>
+      <a id="export" class="btn" href="/api/export.csv">Export CSV</a>
+    </div>
+  </header>
+  <p id="msg" class="msg" role="status" hidden></p>
+
+  <main>
+    <section class="stats" aria-label="Summary">
+      <div><b id="s-total">0</b><span>Packets</span></div>
+      <div class="tcp"><b id="s-tcp">0</b><span>TCP</span></div>
+      <div class="udp"><b id="s-udp">0</b><span>UDP</span></div>
+      <div class="icmp"><b id="s-icmp">0</b><span>ICMP</span></div>
+      <div><b id="s-bytes">0 B</b><span>Total bytes</span></div>
+      <div><b id="s-avg">0 B</b><span>Average size</span></div>
+    </section>
+
+    <section class="charts" aria-label="Charts">
+      <figure><figcaption>Protocol distribution</figcaption><div class="cv"><canvas id="c-proto"></canvas></div></figure>
+      <figure><figcaption>Packets over time <small id="bucket"></small></figcaption><div class="cv"><canvas id="c-time"></canvas></div></figure>
+      <figure><figcaption>Traffic volume (bytes) <small id="bucket2"></small></figcaption><div class="cv"><canvas id="c-bytes"></canvas></div></figure>
+      <p id="chart-note" class="msg" hidden>Charts need Chart.js from the internet (cdn.jsdelivr.net), which could not be loaded.</p>
+    </section>
+
+    <section class="packets">
+      <div class="filters">
+        <label>Protocol
+          <select id="f-proto">
+            <option value="">All</option><option>TCP</option><option>UDP</option><option>ICMP</option><option value="OTHER">Other</option>
+          </select>
+        </label>
+        <label>Source IP <input id="f-src" placeholder="e.g. 192.168.1."></label>
+        <label>Destination IP <input id="f-dst" placeholder="e.g. 8.8.8.8"></label>
+        <span id="count" class="count"></span>
+      </div>
+      <div class="split">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Time</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Ports</th><th>Size</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <aside id="detail" class="detail" aria-live="polite"><p class="empty">Select a packet to see its layers and raw bytes.</p></aside>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
